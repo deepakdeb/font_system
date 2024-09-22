@@ -1,9 +1,13 @@
 <?php
 
-require_once 'FontUploader.php';
-require_once 'FontGroupManager.php';
+namespace FontSystem\Controller;
 
-class FontController
+use FontSystem\Manager\FontGroupManagerInterface;
+use FontSystem\Manager\FontUploaderInterface;
+use FontSystem\Model\Database;
+use PDO;
+
+class FontController implements FontControllerInterface
 {
     private $uploader;
     private $fontGroupManager;
@@ -13,6 +17,7 @@ class FontController
     {
         $this->uploader = $uploader;
         $this->fontGroupManager = $fontGroupManager;
+
         $database = new Database();
         $this->conn = $database->getConnection();
     }

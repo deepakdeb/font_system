@@ -1,13 +1,8 @@
 <?php
+namespace FontSystem\Manager;
 
-require_once 'Database.php';
-
-interface FontGroupManagerInterface
-{
-    public function createGroup(string $groupName, array $fontGroupData): array;
-    public function getGroups(): array;
-    public function deleteGroup(int $groupId): array;
-}
+use FontSystem\Model\Database;
+use PDO;
 
 class FontGroupManager implements FontGroupManagerInterface
 {
@@ -44,23 +39,27 @@ class FontGroupManager implements FontGroupManagerInterface
             }
 
             return ["status" => "success", "message" => "Font group created successfully"];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return ["status" => "error", "message" => $e->getMessage()];
         }
     }
 
     public function getGroups(): array
     {
-        // Modify query to get font count for each group
-        $query = "
+        try {
+            // Modify query to get font count for each group
+            $query = "
             SELECT fg.id, fg.group_name, COUNT(fgf.font_id) AS font_count, GROUP_CONCAT(fgf.font_title SEPARATOR ', ') as fonts
             FROM font_groups fg
             JOIN font_group_fonts fgf ON fg.id = fgf.group_id
             GROUP BY fg.id, fg.group_name
         ";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return ["status" => "error", "message" => $e->getMessage()];
+        }
     }
 
 
@@ -73,7 +72,7 @@ class FontGroupManager implements FontGroupManagerInterface
             $stmt->execute();
 
             return ["status" => "success", "message" => "Font group deleted successfully"];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return ["status" => "error", "message" => $e->getMessage()];
         }
     }

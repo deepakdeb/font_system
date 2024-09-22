@@ -1,11 +1,7 @@
 <?php
 
-require_once 'Database.php';
-
-interface FontUploaderInterface
-{
-    public function upload(array $file): array;
-}
+namespace FontSystem\Manager;
+use FontSystem\Model\Database;
 
 class FontUploader implements FontUploaderInterface
 {
@@ -19,7 +15,7 @@ class FontUploader implements FontUploaderInterface
         $this->conn = $database->getConnection();
     }
 
-    public function upload(array $file): array
+    public function upload($file): array
     {
         $fileType = mime_content_type($file['tmp_name']);
 

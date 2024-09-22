@@ -3,13 +3,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-// backend/index.php
-require_once 'FontUploader.php';
-require_once 'FontGroupManager.php';
-require_once 'FontController.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use FontSystem\Controller\FontController;
+use FontSystem\Manager\FontGroupManager;
+use FontSystem\Manager\FontUploader;
+use FontSystem\Model\Database;
 
 // Allow CORS and handle preflight requests
-header('Access-Control-Allow-Origin: http://localhost:3000');
+header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
@@ -27,6 +29,8 @@ $inputData = json_decode(file_get_contents('php://input'), true);
 $uploader = new FontUploader();
 $fontGroupManager = new FontGroupManager();
 $controller = new FontController($uploader, $fontGroupManager);
+
+$database = new Database();
 
 // Handle API requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['font'])) {

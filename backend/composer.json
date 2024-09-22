@@ -1,0 +1,13 @@
+{
+    "name": "deepak/font-system-backend",
+    "description": "Backend for font system",
+    "require": {
+      "ext-pdo": "*"
+    },
+    "autoload": {
+      "psr-4": {
+        "FontSystem\\": "src/"
+      }
+    }
+  }
+  

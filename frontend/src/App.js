@@ -6,6 +6,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const App = () => {
   const [fonts, setFonts] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [error, setError] = useState(null); // Error message state
+  const [success, setSuccess] = useState(null); // Success message state
 
   useEffect(() => {
     fetchFonts();
@@ -14,7 +16,7 @@ const App = () => {
 
   const fetchFonts = async () => {
     const response = await fetch(
-      "http://localhost/font_system/backend/index.php?action=getFonts"
+      "http://localhost/font_system/backend/src/index.php?action=getFonts"
     );
     const data = await response.json();
     setFonts(data);
@@ -22,27 +24,35 @@ const App = () => {
 
   const fetchGroups = async () => {
     const response = await fetch(
-      "http://localhost/font_system/backend/index.php?action=getGroups"
+      "http://localhost/font_system/backend/src/index.php?action=getGroups"
     );
     const data = await response.json();
     setGroups(data);
   };
 
   const handleUpload = async (file) => {
-    const formData = new FormData();
-    formData.append("font", file);
+    try {
+      const formData = new FormData();
+      formData.append("font", file);
 
-    const response = await fetch(
-      "http://localhost/font_system/backend/index.php",
-      {
-        method: "POST",
-        body: formData,
+      const response = await fetch(
+        "http://localhost/font_system/backend/src/index.php",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      if (data.status === "success") {
+        setError(null); // Clear any previous error
+        setSuccess("Font uploaded successfully!");
+        fetchFonts(); // Refresh the font list
+      } else {
+        throw new Error(data.message || "Failed to upload font.");
       }
-    );
-
-    const data = await response.json();
-    if (data.status === "success") {
-      fetchFonts();
+    } catch (err) {
+      setError(err.message); // Set the error message to display
     }
   };
 
@@ -54,7 +64,7 @@ const App = () => {
 
     try {
       const response = await fetch(
-        "http://localhost/font_system/backend/index.php",
+        "http://localhost/font_system/backend/src/index.php",
         {
           method: "POST",
           headers: {
@@ -67,7 +77,11 @@ const App = () => {
       const data = await response.json();
 
       if (data.status === "success") {
+        setError(null); // Clear any previous errors
+        setSuccess("Font group created successfully!");
         fetchGroups();
+      } else {
+        throw new Error(data.message || "Failed to create font group.");
       }
 
       return data;
@@ -86,7 +100,7 @@ const App = () => {
 
     if (confirmDelete) {
       const response = await fetch(
-        "http://localhost/font_system/backend/index.php",
+        "http://localhost/font_system/backend/src/index.php",
         {
           method: "POST",
           headers: {
@@ -110,7 +124,7 @@ const App = () => {
 
     if (confirmDelete) {
       const response = await fetch(
-        "http://localhost/font_system/backend/index.php",
+        "http://localhost/font_system/backend/src/index.php",
         {
           method: "POST",
           headers: {
@@ -131,12 +145,26 @@ const App = () => {
     <div className="container">
       <h1 className="text-center mt-3 mb-5">Font Group System</h1>
 
+      {/* Success Message Display */}
+      {success && (
+        <div className="alert alert-success" role="alert">
+          {success}
+        </div>
+      )}
+
+      {/* Error Message Display */}
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+
       {/* Upload Font Section */}
       <FontUpload handleUpload={handleUpload} />
 
       <div className="card my-4">
         <div className="card-title text-center mt-3">
-            <h4>Uploaded Fonts</h4>
+          <h4>Uploaded Fonts</h4>
         </div>
 
         <div className="card-body">
@@ -162,7 +190,7 @@ const App = () => {
                       {`
                                                 @font-face {
                                                     font-family: 'Font${font.id}';
-                                                    src: url('http://localhost/font_system/backend/serve_font.php?file=${font.file_name}');
+                                                    src: url('http://localhost/font_system/backend/src/serve_font.php?file=${font.file_name}');
                                                 }
                                             `}
                     </style>

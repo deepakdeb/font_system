@@ -1,4 +1,8 @@
 <?php
+
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/octet-stream');
+
 $fontFile = isset($_GET['file']) ? $_GET['file'] : null;
 
 if ($fontFile && file_exists(__DIR__ . '/uploads/' . $fontFile)) {
