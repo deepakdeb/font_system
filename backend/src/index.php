@@ -48,6 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['font'])) {
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($inputData['deleteFont'])) {
     // Handle deleting a font
     echo json_encode($controller->deleteFont($inputData['deleteFont']));
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($inputData['editGroup'])) {
+    // Handle editing the font group
+    echo json_encode($controller->updateFontGroup($inputData['editGroup']['id'], $inputData['editGroup']['groupName'], $inputData['editGroup']['fontGroupData']));
 } else {
     http_response_code(404);
     echo json_encode(["message" => "Invalid API request"]);

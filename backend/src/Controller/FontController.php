@@ -56,6 +56,10 @@ class FontController implements FontControllerInterface
         return $this->fontGroupManager->createGroup($groupName, $fontGroupData);
     }
 
+    public function updateFontGroup($groupId, $groupName, $fontGroupData) {
+        return $this->fontGroupManager->updateGroup($groupId, $groupName, $fontGroupData);
+    }
+
     public function getFontGroups()
     {
         return $this->fontGroupManager->getGroups();
