@@ -21,9 +21,11 @@ const App = () => {
     fetchGroups();
   }, []);
 
+  const base_url = "http://localhost/font_system/";
+
   const fetchFonts = async () => {
     const response = await fetch(
-      "http://localhost/font_system/backend/src/index.php?action=getFonts"
+      base_url  + "backend/src/index.php?action=getFonts"
     );
     const data = await response.json();
     setFonts(data);
@@ -31,7 +33,7 @@ const App = () => {
 
   const fetchGroups = async () => {
     const response = await fetch(
-      "http://localhost/font_system/backend/src/index.php?action=getGroups"
+      base_url  + "backend/src/index.php?action=getGroups"
     );
     const data = await response.json();
     setGroups(data);
@@ -43,7 +45,7 @@ const App = () => {
       formData.append("font", file);
 
       const response = await fetch(
-        "http://localhost/font_system/backend/src/index.php",
+        base_url  + "backend/src/index.php",
         {
           method: "POST",
           body: formData,
@@ -71,7 +73,7 @@ const App = () => {
 
     try {
       const response = await fetch(
-        "http://localhost/font_system/backend/src/index.php",
+        base_url  + "backend/src/index.php",
         {
           method: "POST",
           headers: {
@@ -107,7 +109,7 @@ const App = () => {
 
     if (confirmDelete) {
       const response = await fetch(
-        "http://localhost/font_system/backend/src/index.php",
+        base_url  + "backend/src/index.php",
         {
           method: "POST",
           headers: {
@@ -131,7 +133,7 @@ const App = () => {
 
     if (confirmDelete) {
       const response = await fetch(
-        "http://localhost/font_system/backend/src/index.php",
+        base_url  + "backend/src/index.php",
         {
           method: "POST",
           headers: {
@@ -186,7 +188,7 @@ const App = () => {
     // If all validations pass, proceed with the update
     try {
       const response = await fetch(
-        "http://localhost/font_system/backend/src/index.php",
+        base_url  + "backend/src/index.php",
         {
           method: "POST",
           headers: {
@@ -243,7 +245,7 @@ const App = () => {
       <FontUpload handleUpload={handleUpload} />
 
       {/* Font List */}
-      <FontList fonts={fonts} handleDeleteFont={handleDeleteFont} />
+      <FontList fonts={fonts} handleDeleteFont={handleDeleteFont} base_url={base_url} />
 
       {/* Font Group Creation Form */}
       <FontGroupForm fonts={fonts} handleGroupSubmit={handleGroupSubmit} />

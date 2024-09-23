@@ -1,6 +1,6 @@
 import React from "react";
 
-const FontList = ({ fonts, handleDeleteFont }) => {
+const FontList = ({ fonts, handleDeleteFont, base_url }) => {
   return (
     <div className="card my-4">
       <div className="card-title text-center mt-3">
@@ -27,7 +27,7 @@ const FontList = ({ fonts, handleDeleteFont }) => {
                     {`
                       @font-face {
                         font-family: 'Font${font.id}';
-                        src: url('http://localhost/font_system/backend/src/serve_font.php?file=${font.file_name}');
+                        src: url('${base_url}backend/src/serve_font.php?file=${font.file_name}');
                       }
                     `}
                   </style>

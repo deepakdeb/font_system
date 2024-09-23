@@ -20,11 +20,12 @@ const FontGroupList = ({ groups, handleEditGroup, handleDeleteGroup }) => {
           </thead>
           <tbody>
             {groups.map((group) => (
+
               <tr key={group.id}>
-                <td>{group.id}</td>
+                <td>{group.id} {console.log(group.fontGroupData.length)}</td>
                 <td>{group.group_name}</td>
                 <td>{group.fonts}</td>
-                <td>{group.font_count}</td>
+                <td>{group.fontGroupData.length}</td>
                 <td>
                   <button
                     onClick={() => handleEditGroup(group)}
