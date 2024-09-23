@@ -44,36 +44,37 @@ class FontGroupManager implements FontGroupManagerInterface
         }
     }
 
-    public function updateGroup($groupId, $groupName, $fontGroupData): array {
+    public function updateGroup($groupId, $groupName, $fontGroupData): array
+    {
         try {
             // Begin transaction
             $this->conn->beginTransaction();
-    
+
             // Update the group name
             $query = "UPDATE font_groups SET group_name = :group_name WHERE id = :group_id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':group_name', $groupName);
             $stmt->bindParam(':group_id', $groupId);
             $stmt->execute();
-    
+
             // Fetch existing font associations for the group
             $query = "SELECT font_id, font_title FROM font_group_fonts WHERE group_id = :group_id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':group_id', $groupId);
             $stmt->execute();
             $existingAssociations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
             // Create an associative array for easier comparison
             $existingFonts = [];
             foreach ($existingAssociations as $assoc) {
                 $existingFonts[$assoc['font_id']] = $assoc['font_title'];
             }
-    
+
             // Fonts that are present in the new data but not in the existing group
             foreach ($fontGroupData as $fontItem) {
                 $fontId = $fontItem['font'];
                 $fontTitle = $fontItem['fontTitle'];
-    
+
                 // Check if the font already exists in the group
                 if (isset($existingFonts[$fontId])) {
                     // If font exists but the title has changed, update the title
@@ -85,7 +86,7 @@ class FontGroupManager implements FontGroupManagerInterface
                         $stmt->bindParam(':font_id', $fontId);
                         $stmt->execute();
                     }
-    
+
                     // Remove from the existingFonts array to track which fonts should be deleted later
                     unset($existingFonts[$fontId]);
                 } else {
@@ -98,7 +99,7 @@ class FontGroupManager implements FontGroupManagerInterface
                     $stmt->execute();
                 }
             }
-    
+
             // Fonts that are in the existing group but not in the new data need to be removed
             if (!empty($existingFonts)) {
                 $fontIdsToRemove = array_keys($existingFonts);
@@ -110,34 +111,65 @@ class FontGroupManager implements FontGroupManagerInterface
                 }
                 $stmt->execute();
             }
-    
+
             // Commit transaction
             $this->conn->commit();
-    
+
             return ["status" => "success", "message" => "Font group updated successfully"];
         } catch (\Exception $e) {
             $this->conn->rollBack();
             return ["status" => "error", "message" => $e->getMessage()];
         }
     }
-    
+
 
     public function getGroups(): array
     {
-        try {
-            // Modify query to get font count for each group
-            $query = "
-            SELECT fg.id, fg.group_name, COUNT(fgf.font_id) AS font_count, GROUP_CONCAT(fgf.font_title SEPARATOR ', ') as fonts
+        // try {
+        //     // Modify query to get font count for each group
+        //     $query = "
+        //     SELECT fg.id, fg.group_name, COUNT(fgf.font_id) AS font_count, GROUP_CONCAT(fgf.font_title SEPARATOR ', ') as fonts
+        //     FROM font_groups fg
+        //     JOIN font_group_fonts fgf ON fg.id = fgf.group_id
+        //     GROUP BY fg.id, fg.group_name
+        // ";
+        //     $stmt = $this->conn->prepare($query);
+        //     $stmt->execute();
+        //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // } catch (\Exception $e) {
+        //     return ["status" => "error", "message" => $e->getMessage()];
+        // }
+
+        $query = "
+            SELECT fg.id AS group_id, fg.group_name, fgf.font_id, fgf.font_title
             FROM font_groups fg
-            JOIN font_group_fonts fgf ON fg.id = fgf.group_id
-            GROUP BY fg.id, fg.group_name
+            LEFT JOIN font_group_fonts fgf ON fg.id = fgf.group_id
+            ORDER BY fg.id
         ";
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\Exception $e) {
-            return ["status" => "error", "message" => $e->getMessage()];
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Process the data into the desired structure
+        $processedGroups = [];
+        foreach ($groups as $row) {
+            if (!isset($processedGroups[$row['group_id']])) {
+                $processedGroups[$row['group_id']] = [
+                    'id' => $row['group_id'],
+                    'group_name' => $row['group_name'],
+                    'fontGroupData' => []
+                ];
+            }
+            if ($row['font_id']) {
+                $processedGroups[$row['group_id']]['fontGroupData'][] = [
+                    'font' => $row['font_id'],
+                    'fontTitle' => $row['font_title']
+                ];
+            }
         }
+
+        return array_values($processedGroups);
+
     }
 
 

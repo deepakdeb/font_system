@@ -30,9 +30,9 @@ const FontGroupEdit = ({
         <div className="form-group">
           <label>Fonts</label>
           {editFontGroupData.map((font, index) => (
-            <div key={index} className="d-flex">
+            <div key={index} className="mb-2 d-flex align-items-center">
               <select
-                className="form-control"
+                className="form-control me-2"
                 name="font"
                 value={font.font}
                 onChange={(e) => handleEditFontChange(index, e)}
@@ -46,7 +46,7 @@ const FontGroupEdit = ({
               </select>
               <input
                 type="text"
-                className="form-control ml-2"
+                className="form-control me-2"
                 name="fontTitle"
                 placeholder="Font Title"
                 value={font.fontTitle}

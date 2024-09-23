@@ -28,7 +28,7 @@ const FontGroupList = ({ groups, handleEditGroup, handleDeleteGroup }) => {
                 <td>
                   <button
                     onClick={() => handleEditGroup(group)}
-                    className="btn btn-primary mr-2"
+                    className="btn btn-primary me-2"
                   >
                     Edit
                   </button>
